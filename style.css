@@ -636,3 +636,73 @@ button {
     gap: 4px;
   }
   }
+/* ==========================================
+   BIGDIVO — NOVA ABERTURA DA AYLA
+   ========================================== */
+
+/* Vidro embaçado sobre as portas */
+#gelo {
+  background: transparent;
+  touch-action: none;
+}
+
+/* Portas: perspectiva da abertura */
+#portas {
+  perspective: 1200px;
+}
+
+#portas .imagem-portas {
+  transform-origin: center center;
+}
+
+/* Jardim revelado por trás das portas */
+#portas .jardim-atras {
+  position: absolute;
+  inset: 0;
+  background-image: url("imagens/jardim.png");
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#portas.abrir .jardim-atras {
+  opacity: 1;
+}
+
+/* Folhas das portas */
+.folha-porta {
+  position: absolute;
+  top: 26%;
+  height: 41%;
+  width: 22%;
+  z-index: 3;
+
+  background-image: url("imagens/portas.png");
+  background-size: 455% 244%;
+  background-repeat: no-repeat;
+
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+
+  transition: transform 3s ease-in-out;
+}
+
+.folha-porta.esquerda {
+  left: 28%;
+  background-position: 36% 42%;
+  transform-origin: left center;
+}
+
+.folha-porta.direita {
+  right: 28%;
+  background-position: 64% 42%;
+  transform-origin: right center;
+}
+
+#portas.abrir .folha-porta.esquerda {
+  transform: rotateY(-78deg);
+}
+
+#portas.abrir .folha-porta.direita {
+  transform: rotateY(
