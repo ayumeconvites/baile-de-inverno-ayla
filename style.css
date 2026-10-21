@@ -1,0 +1,505 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap');
+
+:root {
+  --azul: #7199c8;
+  --prata: #c5d8ed;
+  --offwhite: #faf7f0;
+  --escuro: #344d70;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #101d35;
+  font-family: 'Montserrat', sans-serif;
+}
+
+button {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#convite {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  perspective: 1200px;
+}
+
+/* CENAS */
+
+.cena {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  transition:
+    opacity 1.8s ease,
+    visibility 1.8s;
+}
+
+.cena.ativa {
+  opacity: 1;
+  visibility: visible;
+}
+
+.imagem-portas,
+.imagem-jardim,
+.imagem-salao,
+.imagem-moldura {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  will-change: transform;
+}
+
+.imagem-portas {
+  background-image: url('imagens/portas.webp');
+}
+
+.imagem-jardim {
+  background-image: url('imagens/jardim.webp');
+}
+
+.imagem-salao {
+  background-image: url('imagens/salao.webp');
+}
+
+.imagem-moldura {
+  background-image: url('imagens/moldura.webp');
+}
+
+/* APROXIMAÇÃO DAS PORTAS */
+
+#portas.aproximar .imagem-portas {
+  animation: aproximar 5s ease-in-out forwards;
+}
+
+@keyframes aproximar {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.16);
+  }
+}
+
+/* ABERTURA DAS PORTAS */
+
+.porta {
+  position: absolute;
+  top: 24%;
+  height: 42%;
+  width: 23%;
+  background-image: url('imagens/portas.webp');
+  background-size: 434.78% 238.1%;
+  backface-visibility: hidden;
+  opacity: 0;
+  z-index: 2;
+}
+
+.porta.esquerda {
+  left: 27%;
+  transform-origin: left center;
+}
+
+.porta.direita {
+  right: 27%;
+  transform-origin: right center;
+}
+
+#portas.abrir .porta {
+  opacity: 1;
+}
+
+#portas.abrir .esquerda {
+  animation: abrirEsquerda 3.5s ease-in-out forwards;
+}
+
+#portas.abrir .direita {
+  animation: abrirDireita 3.5s ease-in-out forwards;
+}
+
+@keyframes abrirEsquerda {
+  to {
+    transform: perspective(700px) rotateY(-75deg);
+  }
+}
+
+@keyframes abrirDireita {
+  to {
+    transform: perspective(700px) rotateY(75deg);
+  }
+}
+
+.brilho-portas {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(210,235,255,.55),
+    transparent 65%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+#portas.abrir .brilho-portas {
+  animation: brilhoEntrada 3.5s ease-in-out forwards;
+}
+
+@keyframes brilhoEntrada {
+  0% { opacity: 0; }
+  55% { opacity: .7; }
+  100% { opacity: 0; }
+}
+
+/* JARDIM */
+
+#jardim.ativa .imagem-jardim {
+  animation: cameraJardim 8s ease-in-out forwards;
+}
+
+@keyframes cameraJardim {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.3) translate(-4%, 3%);
+  }
+}
+
+/* SALÃO */
+
+#salao.ativa .imagem-salao {
+  animation: cameraSalao 7s ease-in-out forwards;
+}
+
+@keyframes cameraSalao {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.13);
+  }
+}
+
+/* GIRO PARA A DIREITA */
+
+#salao.girar {
+  transform-origin: center;
+  animation: giroDireita 2.5s ease-in-out forwards;
+}
+
+@keyframes giroDireita {
+  from {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+
+  to {
+    transform: rotateY(-65deg);
+    opacity: 0;
+  }
+}
+
+/* MOLDURA */
+
+#final {
+  transform-origin: center;
+}
+
+#final.ativa {
+  animation: revelarMoldura 2.5s ease-out forwards;
+}
+
+@keyframes revelarMoldura {
+  from {
+    transform: perspective(1200px)
+      rotateY(35deg)
+      scale(1.1);
+    opacity: 0;
+  }
+
+  to {
+    transform: perspective(1200px)
+      rotateY(0deg)
+      scale(1);
+    opacity: 1;
+  }
+}
+
+/* CONTEÚDO */
+
+.conteudo-convite {
+  position: absolute;
+  top: 17%;
+  left: 17%;
+  width: 66%;
+  height: 61%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  color: var(--escuro);
+  z-index: 3;
+}
+
+.titulo-convite h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(36px, 11vw, 75px);
+  font-weight: 500;
+  letter-spacing: 5px;
+  color: #7899bc;
+  text-shadow: 1px 2px 2px #fff;
+}
+
+.titulo-convite h2 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(14px, 4vw, 25px);
+  letter-spacing: 4px;
+  color: #8da6c1;
+  margin-top: 8px;
+}
+
+.dados-festa {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.data {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(11px, 3vw, 19px);
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.horario {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  color: #6e91ba;
+}
+
+.separador {
+  font-size: 22px;
+  color: #9bbfe5;
+}
+
+/* QUATRO BOTÕES EM UMA LINHA */
+
+.botoes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  width: 100%;
+}
+
+.botao {
+  min-width: 0;
+  border: 1px solid #a9c6e8;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #ffffff,
+    #d9eaff 45%,
+    #83add9 100%
+  );
+  box-shadow:
+    0 3px 10px #8baed1,
+    inset 0 2px 5px #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transition: transform .3s ease;
+  color: #42678f;
+}
+
+.botao:active {
+  transform: scale(.9);
+}
+
+.botao span {
+  font-size: clamp(15px, 4vw, 25px);
+}
+
+.botao small {
+  font-size: clamp(5px, 1.5vw, 9px);
+  font-weight: 500;
+}
+
+/* GELO */
+
+#gelo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  touch-action: none;
+}
+
+#instrucao {
+  position: absolute;
+  bottom: 12%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 21;
+  color: #fff;
+  pointer-events: none;
+  text-shadow: 0 2px 8px #274b78;
+  animation: pulsar 2s infinite;
+}
+
+#instrucao span {
+  font-size: 35px;
+}
+
+#instrucao p {
+  font-size: 13px;
+  letter-spacing: 2px;
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: .5;
+  }
+}
+
+/* NEVE */
+
+#neve {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* JANELAS DE CRISTAL */
+
+.modal {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(15,35,65,.6);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.aberto {
+  display: flex;
+}
+
+.janela-cristal {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 40px 25px;
+  background: var(--offwhite);
+  border: 3px solid #c2d9ef;
+  outline: 1px solid #fff;
+  outline-offset: -9px;
+  box-shadow:
+    0 0 30px #b5d9ff,
+    inset 0 0 20px #dcecff;
+  border-radius: 12px;
+  text-align: center;
+  animation: aparecer .5s ease-out;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.janela-cristal h3 {
+  font-family: 'Cinzel', serif;
+  color: #688cb7;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+#modal-conteudo {
+  color: #566b85;
+  font-size: 14px;
+  line-height: 2;
+}
+
+.fechar {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  border: none;
+  background: transparent;
+  font-size: 30px;
+  color: #789ac1;
+}
+
+.ornamento {
+  color: #a4c7ed;
+  font-size: 25px;
+  margin: 15px;
+}
+
+/* MÚSICA */
+
+#controle-musica {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 40;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background: rgba(180,210,240,.45);
+  color: white;
+  font-size: 22px;
+  backdrop-filter: blur(10px);
+}
+
+@media (max-height: 650px) {
+  .conteudo-convite {
+    top: 16%;
+    height: 64%;
+  }
+
+  .dados-festa {
+    gap: 7px;
+  }
+  }
