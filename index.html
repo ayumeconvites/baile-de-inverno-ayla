@@ -1,128 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0,
-    maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0"
   >
 
-  <meta
-    name="theme-color"
-    content="#9bb9dc"
-  >
+  <meta name="theme-color" content="#a9c9e8">
 
-  <title>Ayla | 15 Anos | Baile de Inverno</title>
+  <title>Ayla | 15 Anos | Baile de Inverno Encantado</title>
 
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 
 <body>
 
   <main id="convite">
 
-    <!-- CENA 1: PORTAS -->
+    <!-- CENA 1: PORTAS DO PALÁCIO -->
 
     <section id="portas" class="cena ativa">
 
-      <div class="imagem-portas"></div>
+      <div class="imagem-cena imagem-portas"></div>
 
-      <div class="porta esquerda"></div>
-      <div class="porta direita"></div>
-
-      <div class="brilho-portas"></div>
+      <div class="luz-portas"></div>
 
     </section>
 
 
-    <!-- CENA 2: JARDIM -->
+    <!-- CENA 2: JARDIM ENCANTADO -->
 
     <section id="jardim" class="cena">
 
-      <div class="imagem-jardim"></div>
+      <div class="imagem-cena imagem-jardim"></div>
 
     </section>
 
 
-    <!-- CENA 3: SALÃO -->
+    <!-- CENA 3: SALÃO DE BAILE -->
 
     <section id="salao" class="cena">
 
-      <div class="imagem-salao"></div>
+      <div class="imagem-cena imagem-salao"></div>
 
     </section>
 
 
-    <!-- CENA 4: MOLDURA -->
+    <!-- CENA 4: MOLDURA INTERATIVA -->
 
     <section id="final" class="cena">
 
-      <div class="imagem-moldura"></div>
+      <div class="imagem-cena imagem-moldura"></div>
 
       <div class="conteudo-convite">
 
-        <div class="titulo-convite">
+        <div class="informacoes">
 
           <h1>AYLA</h1>
 
-          <h2>15 ANOS</h2>
+          <p class="idade">15 ANOS</p>
+
+          <div class="divisor"></div>
+
+          <p class="data">27 DE FEVEREIRO DE 2027</p>
+
+          <p class="horario">ÀS 20H</p>
 
         </div>
 
-        <div class="dados-festa">
 
-          <div class="separador">❄</div>
-
-          <p class="data">
-            27 DE FEVEREIRO DE 2027
-          </p>
-
-          <p class="horario">
-            20H
-          </p>
-
-          <div class="separador">❄</div>
-
-        </div>
+        <!-- QUATRO BOTÕES CLICÁVEIS -->
 
         <div class="botoes">
 
           <button
+            type="button"
             class="botao"
-            onclick="abrirModal('confirmacao')"
-            aria-label="Confirmação de presença"
+            data-modal="confirmacao"
+            aria-label="Confirmação"
           >
-            <span>♡</span>
-            <small>Confirmar</small>
+            <span>✓</span>
           </button>
 
           <button
+            type="button"
             class="botao"
-            onclick="abrirModal('local')"
-            aria-label="Local da festa"
+            data-modal="local"
+            aria-label="Localização"
           >
             <span>⌖</span>
-            <small>Local</small>
           </button>
 
           <button
+            type="button"
             class="botao"
-            onclick="abrirModal('presente')"
-            aria-label="Sugestões de presentes"
+            data-modal="presentes"
+            aria-label="Presentes"
           >
             <span>🎁</span>
-            <small>Presentes</small>
           </button>
 
           <button
+            type="button"
             class="botao"
-            onclick="abrirModal('traje')"
+            data-modal="traje"
             aria-label="Dress code"
           >
-            <span>♕</span>
-            <small>Traje</small>
+            <span>✦</span>
           </button>
 
         </div>
@@ -131,66 +118,75 @@
 
     </section>
 
-
-    <!-- GELO INTERATIVO -->
-
-    <canvas id="gelo"></canvas>
-
-    <div id="instrucao">
-      <span>❄</span>
-      <p>Deslize o dedo para revelar</p>
-    </div>
-
-
-    <!-- NEVE -->
-
-    <canvas id="neve"></canvas>
-
-
-    <!-- JANELA DE CRISTAL -->
-
-    <div id="modal" class="modal">
-
-      <div class="janela-cristal">
-
-        <button
-          class="fechar"
-          onclick="fecharModal()"
-          aria-label="Fechar"
-        >
-          ×
-        </button>
-
-        <div class="ornamento">❄</div>
-
-        <h3 id="modal-titulo"></h3>
-
-        <div id="modal-conteudo"></div>
-
-        <div class="ornamento">❄</div>
-
-      </div>
-
-    </div>
-
-
-    <!-- MÚSICA -->
-
-    <audio id="musica" loop preload="none">
-      <source src="audio/valsa.mp3" type="audio/mpeg">
-    </audio>
-
-    <button
-      id="controle-musica"
-      onclick="alternarMusica()"
-      aria-label="Ativar ou desativar música"
-    >
-      ♪
-    </button>
-
   </main>
 
-  <script src="script.js"></script>
+
+  <!-- VIDRO EMBAÇADO INTERATIVO -->
+
+  <canvas id="gelo"></canvas>
+
+  <div id="instrucao">
+    ❄️ Deslize o dedo para revelar a magia ❄️
+  </div>
+
+
+  <!-- NEVE CONTÍNUA -->
+
+  <canvas id="neve"></canvas>
+
+
+  <!-- JANELAS DOS BOTÕES -->
+
+  <div id="modal" class="modal oculto">
+
+    <div class="modal-fundo"></div>
+
+    <div class="modal-caixa">
+
+      <button
+        id="fechar-modal"
+        type="button"
+        aria-label="Fechar"
+      >
+        ×
+      </button>
+
+      <div class="ornamento">❄</div>
+
+      <h2 id="modal-titulo"></h2>
+
+      <div id="modal-texto"></div>
+
+      <div class="ornamento inferior">❄</div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MÚSICA -->
+
+  <audio id="musica" loop preload="none">
+
+    <source
+      src="audio/valsa.mp3"
+      type="audio/mpeg"
+    >
+
+  </audio>
+
+  <button
+    id="controle-musica"
+    type="button"
+    aria-label="Ativar ou desativar música"
+  >
+    ♫
+  </button>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script src="script.js?v=3"></script>
 
 </body>
-            </html>
+</html>
