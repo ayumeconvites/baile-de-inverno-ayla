@@ -1,7 +1,7 @@
-/* =====================================
+/* ==========================================
    BIGDIVO STUDIO — AYLA
-   VIDRO CONGELADO INTERATIVO
-   ===================================== */
+   VIDRO CONGELADO + VÍDEO CINEMATOGRÁFICO
+   ========================================== */
 
 "use strict";
 
@@ -13,12 +13,6 @@ const video = document.getElementById("video");
 
 const imagemVidro = new Image();
 imagemVidro.src = "imagens/vidro.png";
-
-/*
-  Aproximadamente 7 passadas:
-  cada passada equivale a percorrer
-  cerca de 70% da largura da tela.
-*/
 
 const PASSADAS = 7;
 const DISTANCIA_POR_PASSADA = 0.70;
@@ -33,11 +27,12 @@ let distanciaTotal = 0;
 let distanciaNecessaria = 0;
 
 let finalizado = false;
-let videoPreparado = false;
+let videoAutorizado = false;
+let videoIniciado = false;
 
-/* =====================================
-   PREPARAR A IMAGEM CONGELADA
-   ===================================== */
+/* ==========================================
+   PREPARAR VIDRO
+   ========================================== */
 
 function desenharImagemCover(img) {
   const escala = Math.max(
@@ -73,18 +68,16 @@ function prepararVidro() {
   ctx.globalCompositeOperation = "source-over";
   ctx.clearRect(0, 0, largura, altura);
 
-  desenharImagemCover(imagemVidro);
+  if (imagemVidro.naturalWidth > 0) {
+    desenharImagemCover(imagemVidro);
+  }
 }
 
 imagemVidro.onload = prepararVidro;
 
-imagemVidro.onerror = () => {
-  console.error("Não foi possível carregar imagens/vidro.png");
-};
-
-/* =====================================
-   LIMPAR O VIDRO COM O DEDO
-   ===================================== */
+/* ==========================================
+   LIMPAR O VIDRO
+   ========================================== */
 
 function limparPonto(x, y) {
   const raio = Math.max(
@@ -144,7 +137,6 @@ function limparCaminho(x, y) {
   }
 
   distanciaTotal += distancia;
-
   ultimoPonto = { x, y };
 
   if (
@@ -155,14 +147,51 @@ function limparCaminho(x, y) {
   }
 }
 
-/* =====================================
-   INTERAÇÃO
-   ===================================== */
+/* ==========================================
+   AUTORIZAR VÍDEO NO PRIMEIRO TOQUE
+   ========================================== */
+
+function autorizarVideo() {
+  if (videoAutorizado) return;
+
+  videoAutorizado = true;
+
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+  video.setAttribute("playsinline", "");
+  video.setAttribute("webkit-playsinline", "");
+
+  /*
+    O play acontece durante o toque.
+    O vídeo permanece invisível enquanto
+    o convidado limpa o vidro.
+  */
+
+  const tentativa = video.play();
+
+  if (tentativa && typeof tentativa.then === "function") {
+    tentativa.catch(erro => {
+      console.warn(
+        "Primeira tentativa de reprodução:",
+        erro
+      );
+    });
+  }
+}
+
+/* ==========================================
+   INTERAÇÃO COM O DEDO
+   ========================================== */
 
 canvas.addEventListener("pointerdown", e => {
-  if (finalizado || !imagemVidro.complete) return;
+  if (finalizado || imagemVidro.naturalWidth === 0) {
+    return;
+  }
 
   e.preventDefault();
+
+  autorizarVideo();
 
   limpando = true;
   ultimoPonto = null;
@@ -170,18 +199,6 @@ canvas.addEventListener("pointerdown", e => {
   canvas.setPointerCapture(e.pointerId);
 
   limparCaminho(e.clientX, e.clientY);
-
-  /*
-    Prepara o vídeo durante a interação.
-    A reprodução será iniciada depois.
-  */
-
-  if (!videoPreparado) {
-    videoPreparado = true;
-
-    video.muted = true;
-    video.load();
-  }
 });
 
 canvas.addEventListener("pointermove", e => {
@@ -200,9 +217,9 @@ function terminarToque() {
 canvas.addEventListener("pointerup", terminarToque);
 canvas.addEventListener("pointercancel", terminarToque);
 
-/* =====================================
-   FINALIZAR O VIDRO
-   ===================================== */
+/* ==========================================
+   FINALIZAR LIMPEZA
+   ========================================== */
 
 async function finalizarVidro() {
   if (finalizado) return;
@@ -213,12 +230,12 @@ async function finalizarVidro() {
   instrucao.classList.add("ocultar");
   canvas.classList.add("desaparecer");
 
-  await esperar(2000);
+  await esperar(1800);
 
   canvas.style.display = "none";
   instrucao.style.display = "none";
 
-  await esperar(500);
+  await esperar(400);
 
   iniciarVideo();
 }
@@ -227,13 +244,25 @@ function esperar(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* =====================================
-   INICIAR VÍDEO
-   ===================================== */
+/* ==========================================
+   MOSTRAR VÍDEO
+   ========================================== */
 
 async function iniciarVideo() {
-  video.currentTime = 0;
-  video.muted = true;
+  if (videoIniciado) return;
+
+  videoIniciado = true;
+
+  /*
+    Reinicia para mostrar a primeira imagem
+    das portas antes da animação.
+  */
+
+  try {
+    video.currentTime = 0;
+  } catch (erro) {
+    console.warn("Não foi possível reiniciar:", erro);
+  }
 
   video.classList.add("mostrar");
 
@@ -241,27 +270,40 @@ async function iniciarVideo() {
     await video.play();
   } catch (erro) {
     console.warn(
-      "O navegador bloqueou a reprodução automática:",
+      "Reprodução automática bloqueada:",
       erro
+    );
+
+    /*
+      Caso o navegador bloqueie,
+      um toque adicional inicia o vídeo.
+    */
+
+    document.addEventListener(
+      "pointerdown",
+      () => {
+        video.play().catch(console.warn);
+      },
+      { once: true }
     );
   }
 }
 
-/* =====================================
-   QUANDO O VÍDEO TERMINAR
-   ===================================== */
+/* ==========================================
+   FINAL DO VÍDEO
+   ========================================== */
 
 video.addEventListener("ended", () => {
-  /*
-    Mantém o vídeo visível no último quadro.
-  */
   video.pause();
 });
 
-/* =====================================
+/* ==========================================
    INICIALIZAÇÃO
-   ===================================== */
+   ========================================== */
 
-if (imagemVidro.complete && imagemVidro.naturalWidth > 0) {
+if (
+  imagemVidro.complete &&
+  imagemVidro.naturalWidth > 0
+) {
   prepararVidro();
-     }
+}
