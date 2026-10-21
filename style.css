@@ -68,25 +68,19 @@ button {
 }
 
 .imagem-portas {
-  background-image: url('imagens/portas.webp');
+  background-image: url('imagens/portas.jpg');
 }
 
 .imagem-jardim {
-  background-image: url('imagens/jardim.webp');
+  background-image: url('imagens/jardim.jpg');
 }
 
 .imagem-salao {
-  background-image: url('imagens/salao.webp');
+  background-image: url('imagens/salao.jpg');
 }
 
 .imagem-moldura {
-  background-image: url('imagens/moldura.webp');
-}
-
-/* APROXIMAÇÃO DAS PORTAS */
-
-#portas.aproximar .imagem-portas {
-  animation: aproximar 5s ease-in-out forwards;
+  background-image: url('imagens/moldura.jpg');
 }
 
 @keyframes aproximar {
@@ -106,7 +100,7 @@ button {
   top: 24%;
   height: 42%;
   width: 23%;
-  background-image: url('imagens/portas.webp');
+  background-image: url('imagens/portas.jpg');
   background-size: 434.78% 238.1%;
   backface-visibility: hidden;
   opacity: 0;
