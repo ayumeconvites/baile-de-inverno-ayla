@@ -1,192 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0, user-scalable=no">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="theme-color" content="#b9d9f4">
 
-  <meta name="theme-color" content="#a9c9e8">
+  <title>Ayla | Baile de Inverno Encantado</title>
 
-  <title>Ayla | 15 Anos | Baile de Inverno Encantado</title>
-
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 
 <body>
 
   <main id="convite">
 
-    <!-- CENA 1: PORTAS DO PALÁCIO -->
+    <!-- IMAGEM DAS PORTAS NÍTIDAS -->
+    <img
+      id="portas"
+      src="imagens/portas.png"
+      alt="Portas do palácio encantado"
+    >
 
-    <section id="portas" class="cena ativa">
+    <!-- IMAGEM CONGELADA QUE SERÁ LIMPA -->
+    <canvas id="vidro"></canvas>
 
-      <div class="imagem-cena imagem-portas"></div>
+    <!-- INSTRUÇÃO -->
+    <div id="instrucao">
+      ❄️ Esfregue a tela para revelar a magia ❄️
+    </div>
 
-      <div class="luz-portas"></div>
-
-    </section>
-
-
-    <!-- CENA 2: JARDIM ENCANTADO -->
-
-    <section id="jardim" class="cena">
-
-      <div class="imagem-cena imagem-jardim"></div>
-
-    </section>
-
-
-    <!-- CENA 3: SALÃO DE BAILE -->
-
-    <section id="salao" class="cena">
-
-      <div class="imagem-cena imagem-salao"></div>
-
-    </section>
-
-
-    <!-- CENA 4: MOLDURA INTERATIVA -->
-
-    <section id="final" class="cena">
-
-      <div class="imagem-cena imagem-moldura"></div>
-
-      <div class="conteudo-convite">
-
-        <div class="informacoes">
-
-          <h1>AYLA</h1>
-
-          <p class="idade">15 ANOS</p>
-
-          <div class="divisor"></div>
-
-          <p class="data">27 DE FEVEREIRO DE 2027</p>
-
-          <p class="horario">ÀS 20H</p>
-
-        </div>
-
-
-        <!-- QUATRO BOTÕES CLICÁVEIS -->
-
-        <div class="botoes">
-
-          <button
-            type="button"
-            class="botao"
-            data-modal="confirmacao"
-            aria-label="Confirmação"
-          >
-            <span>✓</span>
-          </button>
-
-          <button
-            type="button"
-            class="botao"
-            data-modal="local"
-            aria-label="Localização"
-          >
-            <span>⌖</span>
-          </button>
-
-          <button
-            type="button"
-            class="botao"
-            data-modal="presentes"
-            aria-label="Presentes"
-          >
-            <span>🎁</span>
-          </button>
-
-          <button
-            type="button"
-            class="botao"
-            data-modal="traje"
-            aria-label="Dress code"
-          >
-            <span>✦</span>
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
+    <!-- VÍDEO CINEMATOGRÁFICO -->
+    <video
+      id="video"
+      playsinline
+      webkit-playsinline
+      preload="auto"
+    >
+      <source src="abertura.mp4" type="video/mp4">
+    </video>
 
   </main>
 
-
-  <!-- VIDRO EMBAÇADO INTERATIVO -->
-
-  <canvas id="gelo"></canvas>
-
-  <div id="instrucao">
-    ❄️ Deslize o dedo para revelar a magia ❄️
-  </div>
-
-
-  <!-- NEVE CONTÍNUA -->
-
-  <canvas id="neve"></canvas>
-
-
-  <!-- JANELAS DOS BOTÕES -->
-
-  <div id="modal" class="modal oculto">
-
-    <div class="modal-fundo"></div>
-
-    <div class="modal-caixa">
-
-      <button
-        id="fechar-modal"
-        type="button"
-        aria-label="Fechar"
-      >
-        ×
-      </button>
-
-      <div class="ornamento">❄</div>
-
-      <h2 id="modal-titulo"></h2>
-
-      <div id="modal-texto"></div>
-
-      <div class="ornamento inferior">❄</div>
-
-    </div>
-
-  </div>
-
-
-  <!-- MÚSICA -->
-
-  <audio id="musica" loop preload="none">
-
-    <source
-      src="audio/valsa.mp3"
-      type="audio/mpeg"
-    >
-
-  </audio>
-
-  <button
-    id="controle-musica"
-    type="button"
-    aria-label="Ativar ou desativar música"
-  >
-    ♫
-  </button>
-
-
-  <!-- JAVASCRIPT -->
-
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=10"></script>
 
 </body>
 </html>
