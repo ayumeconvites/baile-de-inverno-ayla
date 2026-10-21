@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0,
+    maximum-scale=1.0, user-scalable=no"
+  >
+
+  <meta
+    name="theme-color"
+    content="#9bb9dc"
+  >
+
+  <title>Ayla | 15 Anos | Baile de Inverno</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main id="convite">
+
+    <!-- CENA 1: PORTAS -->
+
+    <section id="portas" class="cena ativa">
+
+      <div class="imagem-portas"></div>
+
+      <div class="porta esquerda"></div>
+      <div class="porta direita"></div>
+
+      <div class="brilho-portas"></div>
+
+    </section>
+
+
+    <!-- CENA 2: JARDIM -->
+
+    <section id="jardim" class="cena">
+
+      <div class="imagem-jardim"></div>
+
+    </section>
+
+
+    <!-- CENA 3: SALÃO -->
+
+    <section id="salao" class="cena">
+
+      <div class="imagem-salao"></div>
+
+    </section>
+
+
+    <!-- CENA 4: MOLDURA -->
+
+    <section id="final" class="cena">
+
+      <div class="imagem-moldura"></div>
+
+      <div class="conteudo-convite">
+
+        <div class="titulo-convite">
+
+          <h1>AYLA</h1>
+
+          <h2>15 ANOS</h2>
+
+        </div>
+
+        <div class="dados-festa">
+
+          <div class="separador">❄</div>
+
+          <p class="data">
+            27 DE FEVEREIRO DE 2027
+          </p>
+
+          <p class="horario">
+            20H
+          </p>
+
+          <div class="separador">❄</div>
+
+        </div>
+
+        <div class="botoes">
+
+          <button
+            class="botao"
+            onclick="abrirModal('confirmacao')"
+            aria-label="Confirmação de presença"
+          >
+            <span>♡</span>
+            <small>Confirmar</small>
+          </button>
+
+          <button
+            class="botao"
+            onclick="abrirModal('local')"
+            aria-label="Local da festa"
+          >
+            <span>⌖</span>
+            <small>Local</small>
+          </button>
+
+          <button
+            class="botao"
+            onclick="abrirModal('presente')"
+            aria-label="Sugestões de presentes"
+          >
+            <span>🎁</span>
+            <small>Presentes</small>
+          </button>
+
+          <button
+            class="botao"
+            onclick="abrirModal('traje')"
+            aria-label="Dress code"
+          >
+            <span>♕</span>
+            <small>Traje</small>
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- GELO INTERATIVO -->
+
+    <canvas id="gelo"></canvas>
+
+    <div id="instrucao">
+      <span>❄</span>
+      <p>Deslize o dedo para revelar</p>
+    </div>
+
+
+    <!-- NEVE -->
+
+    <canvas id="neve"></canvas>
+
+
+    <!-- JANELA DE CRISTAL -->
+
+    <div id="modal" class="modal">
+
+      <div class="janela-cristal">
+
+        <button
+          class="fechar"
+          onclick="fecharModal()"
+          aria-label="Fechar"
+        >
+          ×
+        </button>
+
+        <div class="ornamento">❄</div>
+
+        <h3 id="modal-titulo"></h3>
+
+        <div id="modal-conteudo"></div>
+
+        <div class="ornamento">❄</div>
+
+      </div>
+
+    </div>
+
+
+    <!-- MÚSICA -->
+
+    <audio id="musica" loop preload="none">
+      <source src="audio/valsa.mp3" type="audio/mpeg">
+    </audio>
+
+    <button
+      id="controle-musica"
+      onclick="alternarMusica()"
+      aria-label="Ativar ou desativar música"
+    >
+      ♪
+    </button>
+
+  </main>
+
+  <script src="script.js"></script>
+
+</body>
+            </html>
