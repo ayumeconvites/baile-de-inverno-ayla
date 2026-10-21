@@ -1,15 +1,20 @@
 /* ==========================================
    BIGDIVO STUDIO
    AYLA — BAILE DE INVERNO ENCANTADO
+   JAVASCRIPT COMPLETO
+   ========================================== */
+
+"use strict";
+
+/* ==========================================
+   ELEMENTOS
    ========================================== */
 
 const esperar = ms =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 const gelo = document.getElementById("gelo");
-const ctx = gelo.getContext("2d", {
-  willReadFrequently: true
-});
+const ctx = gelo.getContext("2d");
 
 const neve = document.getElementById("neve");
 const neveCtx = neve.getContext("2d");
@@ -23,6 +28,16 @@ const jardim = document.getElementById("jardim");
 const salao = document.getElementById("salao");
 const final = document.getElementById("final");
 
+/* ==========================================
+   CONFIGURAÇÕES DA ABERTURA
+   ========================================== */
+
+const PASSADAS_NECESSARIAS = 7;
+const DISTANCIA_MINIMA = 0.25;
+
+let passadas = 0;
+let distanciaDaPassada = 0;
+
 let limpando = false;
 let finalizado = false;
 let iniciado = false;
@@ -31,15 +46,8 @@ let ultimoPonto = null;
 let largura = 0;
 let altura = 0;
 
-const TAMANHO_BLOCO = 12;
-const PORCENTAGEM_FINAL = 0.70;
-
-let colunas = 0;
-let linhas = 0;
-let blocosLimpos = new Set();
-
 /* ==========================================
-   VIDRO EMBAÇADO
+   PREPARAÇÃO DO VIDRO
    ========================================== */
 
 function prepararGelo() {
@@ -49,31 +57,45 @@ function prepararGelo() {
   gelo.width = largura;
   gelo.height = altura;
 
-  colunas = Math.ceil(largura / TAMANHO_BLOCO);
-  linhas = Math.ceil(altura / TAMANHO_BLOCO);
+  ctx.clearRect(0, 0, largura, altura);
 
-  blocosLimpos.clear();
+  /*
+    Vidro embaçado:
+    fundo branco-azulado translúcido.
+  */
 
-  ctx.globalCompositeOperation = "source-over";
-
-  // Base translúcida azul-gelo.
   const fundo = ctx.createLinearGradient(
     0, 0,
     largura, altura
   );
 
-  fundo.addColorStop(0, "rgba(226,242,255,0.94)");
-  fundo.addColorStop(0.45, "rgba(188,218,247,0.88)");
-  fundo.addColorStop(1, "rgba(231,245,255,0.94)");
+  fundo.addColorStop(
+    0,
+    "rgba(238,247,255,0.90)"
+  );
+
+  fundo.addColorStop(
+    0.5,
+    "rgba(207,229,248,0.83)"
+  );
+
+  fundo.addColorStop(
+    1,
+    "rgba(239,248,255,0.91)"
+  );
 
   ctx.fillStyle = fundo;
   ctx.fillRect(0, 0, largura, altura);
 
-  // Névoa leitosa, simulando vidro embaçado.
-  for (let i = 0; i < 85; i++) {
+  /*
+    Condensação suave:
+    manchas irregulares de névoa.
+  */
+
+  for (let i = 0; i < 120; i++) {
     const x = Math.random() * largura;
     const y = Math.random() * altura;
-    const raio = 30 + Math.random() * 110;
+    const raio = 25 + Math.random() * 95;
 
     const nevoa = ctx.createRadialGradient(
       x, y, 0,
@@ -82,7 +104,7 @@ function prepararGelo() {
 
     nevoa.addColorStop(
       0,
-      "rgba(255,255,255,0.17)"
+      "rgba(255,255,255,0.23)"
     );
 
     nevoa.addColorStop(
@@ -91,6 +113,7 @@ function prepararGelo() {
     );
 
     ctx.fillStyle = nevoa;
+
     ctx.fillRect(
       x - raio,
       y - raio,
@@ -99,8 +122,11 @@ function prepararGelo() {
     );
   }
 
-  // Cristais delicados nas bordas.
-  for (let i = 0; i < 190; i++) {
+  /*
+    Geada concentrada nas bordas.
+  */
+
+  for (let i = 0; i < 230; i++) {
     const lado = Math.floor(Math.random() * 4);
 
     let x;
@@ -108,24 +134,24 @@ function prepararGelo() {
 
     if (lado === 0) {
       x = Math.random() * largura;
-      y = Math.random() * altura * 0.18;
+      y = Math.random() * altura * 0.13;
     } else if (lado === 1) {
       x = Math.random() * largura;
-      y = altura - Math.random() * altura * 0.18;
+      y = altura - Math.random() * altura * 0.13;
     } else if (lado === 2) {
-      x = Math.random() * largura * 0.18;
+      x = Math.random() * largura * 0.13;
       y = Math.random() * altura;
     } else {
-      x = largura - Math.random() * largura * 0.18;
+      x = largura - Math.random() * largura * 0.13;
       y = Math.random() * altura;
     }
 
-    const tamanho = 4 + Math.random() * 18;
+    const tamanho = 2 + Math.random() * 12;
 
     ctx.strokeStyle =
-      `rgba(255,255,255,${0.15 + Math.random() * 0.4})`;
+      `rgba(255,255,255,${0.12 + Math.random() * 0.35})`;
 
-    ctx.lineWidth = 0.5 + Math.random();
+    ctx.lineWidth = 0.5 + Math.random() * 0.7;
 
     ctx.beginPath();
 
@@ -135,54 +161,44 @@ function prepararGelo() {
     ctx.moveTo(x, y - tamanho);
     ctx.lineTo(x, y + tamanho);
 
-    ctx.moveTo(
-      x - tamanho * 0.6,
-      y - tamanho * 0.6
-    );
-
-    ctx.lineTo(
-      x + tamanho * 0.6,
-      y + tamanho * 0.6
-    );
-
-    ctx.moveTo(
-      x + tamanho * 0.6,
-      y - tamanho * 0.6
-    );
-
-    ctx.lineTo(
-      x - tamanho * 0.6,
-      y + tamanho * 0.6
-    );
-
     ctx.stroke();
   }
 
-  // Brilho congelado nas bordas.
-  const borda = ctx.createRadialGradient(
+  /*
+    Vinheta de gelo nas extremidades.
+  */
+
+  const vinheta = ctx.createRadialGradient(
     largura / 2,
     altura / 2,
-    largura * 0.15,
+    largura * 0.12,
     largura / 2,
     altura / 2,
-    Math.max(largura, altura) * 0.75
+    Math.max(largura, altura) * 0.7
   );
 
-  borda.addColorStop(0, "rgba(255,255,255,0)");
-  borda.addColorStop(1, "rgba(255,255,255,0.35)");
+  vinheta.addColorStop(
+    0,
+    "rgba(255,255,255,0)"
+  );
 
-  ctx.fillStyle = borda;
+  vinheta.addColorStop(
+    1,
+    "rgba(240,250,255,0.45)"
+  );
+
+  ctx.fillStyle = vinheta;
   ctx.fillRect(0, 0, largura, altura);
 }
 
 /* ==========================================
-   LIMPEZA COM O DEDO
+   LIMPEZA DO VIDRO
    ========================================== */
 
 function raioLimpeza() {
   return Math.max(
-    19,
-    Math.min(32, largura * 0.055)
+    18,
+    Math.min(27, largura * 0.052)
   );
 }
 
@@ -194,13 +210,24 @@ function limpar(x, y) {
   ctx.globalCompositeOperation = "destination-out";
 
   const pincel = ctx.createRadialGradient(
-    x, y, raio * 0.45,
+    x, y, raio * 0.35,
     x, y, raio
   );
 
-  pincel.addColorStop(0, "rgba(0,0,0,1)");
-  pincel.addColorStop(0.65, "rgba(0,0,0,0.95)");
-  pincel.addColorStop(1, "rgba(0,0,0,0)");
+  pincel.addColorStop(
+    0,
+    "rgba(0,0,0,1)"
+  );
+
+  pincel.addColorStop(
+    0.65,
+    "rgba(0,0,0,0.95)"
+  );
+
+  pincel.addColorStop(
+    1,
+    "rgba(0,0,0,0)"
+  );
 
   ctx.fillStyle = pincel;
 
@@ -209,78 +236,7 @@ function limpar(x, y) {
   ctx.fill();
 
   ctx.restore();
-
-  registrarAreaLimpa(x, y, raio);
 }
-
-/* ==========================================
-   MEDIÇÃO DA ÁREA LIMPA
-   ========================================== */
-
-function registrarAreaLimpa(x, y, raio) {
-  const inicioColuna = Math.max(
-    0,
-    Math.floor((x - raio) / TAMANHO_BLOCO)
-  );
-
-  const fimColuna = Math.min(
-    colunas - 1,
-    Math.floor((x + raio) / TAMANHO_BLOCO)
-  );
-
-  const inicioLinha = Math.max(
-    0,
-    Math.floor((y - raio) / TAMANHO_BLOCO)
-  );
-
-  const fimLinha = Math.min(
-    linhas - 1,
-    Math.floor((y + raio) / TAMANHO_BLOCO)
-  );
-
-  for (
-    let linha = inicioLinha;
-    linha <= fimLinha;
-    linha++
-  ) {
-    for (
-      let coluna = inicioColuna;
-      coluna <= fimColuna;
-      coluna++
-    ) {
-      const centroX =
-        coluna * TAMANHO_BLOCO + TAMANHO_BLOCO / 2;
-
-      const centroY =
-        linha * TAMANHO_BLOCO + TAMANHO_BLOCO / 2;
-
-      const distancia = Math.hypot(
-        centroX - x,
-        centroY - y
-      );
-
-      // Conta somente a região central do pincel.
-      if (distancia <= raio * 0.65) {
-        blocosLimpos.add(
-          linha * colunas + coluna
-        );
-      }
-    }
-  }
-
-  const total = colunas * linhas;
-
-  if (
-    !finalizado &&
-    blocosLimpos.size / total >= PORCENTAGEM_FINAL
-  ) {
-    finalizarGelo();
-  }
-}
-
-/* ==========================================
-   MOVIMENTO CONTÍNUO DO DEDO
-   ========================================== */
 
 function limparCaminho(x, y) {
   if (!ultimoPonto) {
@@ -289,17 +245,19 @@ function limparCaminho(x, y) {
     return;
   }
 
+  const origem = { ...ultimoPonto };
+
   const distancia = Math.hypot(
-    x - ultimoPonto.x,
-    y - ultimoPonto.y
+    x - origem.x,
+    y - origem.y
   );
+
+  distanciaDaPassada += distancia;
 
   const passos = Math.max(
     1,
-    Math.ceil(distancia / 6)
+    Math.ceil(distancia / 5)
   );
-
-  const origem = { ...ultimoPonto };
 
   for (let i = 1; i <= passos; i++) {
     const px =
@@ -309,15 +267,13 @@ function limparCaminho(x, y) {
       origem.y + (y - origem.y) * i / passos;
 
     limpar(px, py);
-
-    if (finalizado) break;
   }
 
   ultimoPonto = { x, y };
 }
 
 /* ==========================================
-   INTERAÇÃO
+   INTERAÇÃO COM O DEDO
    ========================================== */
 
 gelo.addEventListener("pointerdown", e => {
@@ -326,7 +282,7 @@ gelo.addEventListener("pointerdown", e => {
   e.preventDefault();
 
   limpando = true;
-
+  distanciaDaPassada = 0;
   ultimoPonto = null;
 
   gelo.setPointerCapture(e.pointerId);
@@ -350,15 +306,36 @@ gelo.addEventListener("pointermove", e => {
 });
 
 function terminarToque() {
+  if (!limpando || finalizado) return;
+
   limpando = false;
   ultimoPonto = null;
+
+  /*
+    Só conta como passada quando
+    o dedo percorre uma distância
+    de pelo menos 25% da largura.
+  */
+
+  if (
+    distanciaDaPassada >=
+    window.innerWidth * DISTANCIA_MINIMA
+  ) {
+    passadas++;
+  }
+
+  distanciaDaPassada = 0;
+
+  if (passadas >= PASSADAS_NECESSARIAS) {
+    finalizarGelo();
+  }
 }
 
 gelo.addEventListener("pointerup", terminarToque);
 gelo.addEventListener("pointercancel", terminarToque);
 
 /* ==========================================
-   FINALIZAÇÃO DO GELO
+   FINALIZAÇÃO DO VIDRO
    ========================================== */
 
 async function finalizarGelo() {
@@ -368,7 +345,6 @@ async function finalizarGelo() {
   limpando = false;
 
   instrucao.classList.add("ocultar");
-
   gelo.classList.add("desaparecer");
 
   await esperar(2300);
@@ -380,7 +356,34 @@ async function finalizarGelo() {
 }
 
 /* ==========================================
-   HISTÓRIA CINEMATOGRÁFICA
+   PREPARAÇÃO DAS PORTAS
+   ========================================== */
+
+function prepararPortas() {
+  /*
+    Mantemos a imagem original como
+    cenário e criamos duas folhas
+    que simulam a abertura.
+  */
+
+  if (portas.querySelector(".folha-porta")) return;
+
+  const fundoJardim = document.createElement("div");
+  fundoJardim.className = "jardim-atras";
+
+  const esquerda = document.createElement("div");
+  esquerda.className = "folha-porta esquerda";
+
+  const direita = document.createElement("div");
+  direita.className = "folha-porta direita";
+
+  portas.appendChild(fundoJardim);
+  portas.appendChild(esquerda);
+  portas.appendChild(direita);
+}
+
+/* ==========================================
+   CENAS CINEMATOGRÁFICAS
    ========================================== */
 
 function ativarCena(cena) {
@@ -392,32 +395,26 @@ function ativarCena(cena) {
 }
 
 async function iniciarHistoria() {
-  // Aproximação das portas.
   portas.classList.add("aproximar");
 
   await esperar(5000);
 
-  // Luz mágica na abertura.
   portas.classList.add("abrir");
 
-  await esperar(2400);
+  await esperar(3000);
 
-  // Jardim encantado.
   ativarCena(jardim);
 
   await esperar(8000);
 
-  // Salão de baile.
   ativarCena(salao);
 
   await esperar(7000);
 
-  // Movimento para a direita.
   salao.classList.add("girar");
 
   await esperar(1800);
 
-  // Moldura final.
   ativarCena(final);
 
   await esperar(1600);
@@ -455,8 +452,7 @@ function prepararNeve() {
 
 function animarNeve() {
   neveCtx.clearRect(
-    0,
-    0,
+    0, 0,
     neve.width,
     neve.height
   );
@@ -493,7 +489,7 @@ function animarNeve() {
 }
 
 /* ==========================================
-   BOTÕES E JANELAS
+   BOTÕES INTERATIVOS
    ========================================== */
 
 const modal = document.getElementById("modal");
@@ -587,12 +583,8 @@ controleMusica.addEventListener("click", () => {
    ========================================== */
 
 prepararGelo();
+prepararPortas();
 prepararNeve();
 animarNeve();
 
-window.addEventListener("resize", () => {
-  prepararNeve();
-
-  // Não recria o gelo durante a limpeza.
-  // Isso evita apagar as áreas já reveladas.
-});
+window.addEventListener("resize", prepararNeve);
