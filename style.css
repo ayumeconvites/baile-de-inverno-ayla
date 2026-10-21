@@ -68,19 +68,19 @@ button {
 }
 
 .imagem-portas {
-  background-image: url('imagens/portas.jpg');
+  background-image: url('imagens/portas.png');
 }
 
 .imagem-jardim {
-  background-image: url('imagens/jardim.jpg');
+  background-image: url('imagens/jardim.png');
 }
 
 .imagem-salao {
-  background-image: url('imagens/salao.jpg');
+  background-image: url('imagens/salao.png');
 }
 
 .imagem-moldura {
-  background-image: url('imagens/moldura.jpg');
+  background-image: url('imagens/moldura.png');
 }
 
 @keyframes aproximar {
@@ -100,7 +100,7 @@ button {
   top: 24%;
   height: 42%;
   width: 23%;
-  background-image: url('imagens/portas.jpg');
+  background-image: url('imagens/portas.png');
   background-size: 434.78% 238.1%;
   backface-visibility: hidden;
   opacity: 0;
