@@ -1,233 +1,109 @@
-/* ==========================================
-   BIGDIVO STUDIO
-   AYLA — BAILE DE INVERNO ENCANTADO
-   JAVASCRIPT COMPLETO
-   ========================================== */
+/* =====================================
+   BIGDIVO STUDIO — AYLA
+   VIDRO CONGELADO INTERATIVO
+   ===================================== */
 
 "use strict";
 
-/* ==========================================
-   ELEMENTOS
-   ========================================== */
+const canvas = document.getElementById("vidro");
+const ctx = canvas.getContext("2d");
 
-const esperar = ms =>
-  new Promise(resolve => setTimeout(resolve, ms));
-
-const gelo = document.getElementById("gelo");
-const ctx = gelo.getContext("2d");
-
-const neve = document.getElementById("neve");
-const neveCtx = neve.getContext("2d");
-
-const musica = document.getElementById("musica");
-const controleMusica = document.getElementById("controle-musica");
 const instrucao = document.getElementById("instrucao");
+const video = document.getElementById("video");
 
-const portas = document.getElementById("portas");
-const jardim = document.getElementById("jardim");
-const salao = document.getElementById("salao");
-const final = document.getElementById("final");
+const imagemVidro = new Image();
+imagemVidro.src = "imagens/vidro.png";
 
-/* ==========================================
-   CONFIGURAÇÕES DA ABERTURA
-   ========================================== */
+/*
+  Aproximadamente 7 passadas:
+  cada passada equivale a percorrer
+  cerca de 70% da largura da tela.
+*/
 
-const PASSADAS_NECESSARIAS = 7;
-const DISTANCIA_MINIMA = 0.25;
-
-let passadas = 0;
-let distanciaDaPassada = 0;
-
-let limpando = false;
-let finalizado = false;
-let iniciado = false;
-let ultimoPonto = null;
+const PASSADAS = 7;
+const DISTANCIA_POR_PASSADA = 0.70;
 
 let largura = 0;
 let altura = 0;
 
-/* ==========================================
-   PREPARAÇÃO DO VIDRO
-   ========================================== */
+let limpando = false;
+let ultimoPonto = null;
 
-function prepararGelo() {
+let distanciaTotal = 0;
+let distanciaNecessaria = 0;
+
+let finalizado = false;
+let videoPreparado = false;
+
+/* =====================================
+   PREPARAR A IMAGEM CONGELADA
+   ===================================== */
+
+function desenharImagemCover(img) {
+  const escala = Math.max(
+    largura / img.width,
+    altura / img.height
+  );
+
+  const larguraImagem = img.width * escala;
+  const alturaImagem = img.height * escala;
+
+  const x = (largura - larguraImagem) / 2;
+  const y = (altura - alturaImagem) / 2;
+
+  ctx.drawImage(
+    img,
+    x,
+    y,
+    larguraImagem,
+    alturaImagem
+  );
+}
+
+function prepararVidro() {
   largura = window.innerWidth;
   altura = window.innerHeight;
 
-  gelo.width = largura;
-  gelo.height = altura;
+  canvas.width = largura;
+  canvas.height = altura;
 
+  distanciaNecessaria =
+    largura * DISTANCIA_POR_PASSADA * PASSADAS;
+
+  ctx.globalCompositeOperation = "source-over";
   ctx.clearRect(0, 0, largura, altura);
 
-  /*
-    Vidro embaçado:
-    fundo branco-azulado translúcido.
-  */
-
-  const fundo = ctx.createLinearGradient(
-    0, 0,
-    largura, altura
-  );
-
-  fundo.addColorStop(
-    0,
-    "rgba(238,247,255,0.90)"
-  );
-
-  fundo.addColorStop(
-    0.5,
-    "rgba(207,229,248,0.83)"
-  );
-
-  fundo.addColorStop(
-    1,
-    "rgba(239,248,255,0.91)"
-  );
-
-  ctx.fillStyle = fundo;
-  ctx.fillRect(0, 0, largura, altura);
-
-  /*
-    Condensação suave:
-    manchas irregulares de névoa.
-  */
-
-  for (let i = 0; i < 120; i++) {
-    const x = Math.random() * largura;
-    const y = Math.random() * altura;
-    const raio = 25 + Math.random() * 95;
-
-    const nevoa = ctx.createRadialGradient(
-      x, y, 0,
-      x, y, raio
-    );
-
-    nevoa.addColorStop(
-      0,
-      "rgba(255,255,255,0.23)"
-    );
-
-    nevoa.addColorStop(
-      1,
-      "rgba(255,255,255,0)"
-    );
-
-    ctx.fillStyle = nevoa;
-
-    ctx.fillRect(
-      x - raio,
-      y - raio,
-      raio * 2,
-      raio * 2
-    );
-  }
-
-  /*
-    Geada concentrada nas bordas.
-  */
-
-  for (let i = 0; i < 230; i++) {
-    const lado = Math.floor(Math.random() * 4);
-
-    let x;
-    let y;
-
-    if (lado === 0) {
-      x = Math.random() * largura;
-      y = Math.random() * altura * 0.13;
-    } else if (lado === 1) {
-      x = Math.random() * largura;
-      y = altura - Math.random() * altura * 0.13;
-    } else if (lado === 2) {
-      x = Math.random() * largura * 0.13;
-      y = Math.random() * altura;
-    } else {
-      x = largura - Math.random() * largura * 0.13;
-      y = Math.random() * altura;
-    }
-
-    const tamanho = 2 + Math.random() * 12;
-
-    ctx.strokeStyle =
-      `rgba(255,255,255,${0.12 + Math.random() * 0.35})`;
-
-    ctx.lineWidth = 0.5 + Math.random() * 0.7;
-
-    ctx.beginPath();
-
-    ctx.moveTo(x - tamanho, y);
-    ctx.lineTo(x + tamanho, y);
-
-    ctx.moveTo(x, y - tamanho);
-    ctx.lineTo(x, y + tamanho);
-
-    ctx.stroke();
-  }
-
-  /*
-    Vinheta de gelo nas extremidades.
-  */
-
-  const vinheta = ctx.createRadialGradient(
-    largura / 2,
-    altura / 2,
-    largura * 0.12,
-    largura / 2,
-    altura / 2,
-    Math.max(largura, altura) * 0.7
-  );
-
-  vinheta.addColorStop(
-    0,
-    "rgba(255,255,255,0)"
-  );
-
-  vinheta.addColorStop(
-    1,
-    "rgba(240,250,255,0.45)"
-  );
-
-  ctx.fillStyle = vinheta;
-  ctx.fillRect(0, 0, largura, altura);
+  desenharImagemCover(imagemVidro);
 }
 
-/* ==========================================
-   LIMPEZA DO VIDRO
-   ========================================== */
+imagemVidro.onload = prepararVidro;
 
-function raioLimpeza() {
-  return Math.max(
-    18,
-    Math.min(27, largura * 0.052)
+imagemVidro.onerror = () => {
+  console.error("Não foi possível carregar imagens/vidro.png");
+};
+
+/* =====================================
+   LIMPAR O VIDRO COM O DEDO
+   ===================================== */
+
+function limparPonto(x, y) {
+  const raio = Math.max(
+    17,
+    Math.min(29, largura * 0.055)
   );
-}
-
-function limpar(x, y) {
-  const raio = raioLimpeza();
 
   ctx.save();
 
   ctx.globalCompositeOperation = "destination-out";
 
   const pincel = ctx.createRadialGradient(
-    x, y, raio * 0.35,
+    x, y, raio * 0.30,
     x, y, raio
   );
 
-  pincel.addColorStop(
-    0,
-    "rgba(0,0,0,1)"
-  );
-
-  pincel.addColorStop(
-    0.65,
-    "rgba(0,0,0,0.95)"
-  );
-
-  pincel.addColorStop(
-    1,
-    "rgba(0,0,0,0)"
-  );
+  pincel.addColorStop(0, "rgba(0,0,0,1)");
+  pincel.addColorStop(0.7, "rgba(0,0,0,0.95)");
+  pincel.addColorStop(1, "rgba(0,0,0,0)");
 
   ctx.fillStyle = pincel;
 
@@ -240,24 +116,22 @@ function limpar(x, y) {
 
 function limparCaminho(x, y) {
   if (!ultimoPonto) {
-    limpar(x, y);
+    limparPonto(x, y);
     ultimoPonto = { x, y };
     return;
   }
 
-  const origem = { ...ultimoPonto };
-
   const distancia = Math.hypot(
-    x - origem.x,
-    y - origem.y
+    x - ultimoPonto.x,
+    y - ultimoPonto.y
   );
-
-  distanciaDaPassada += distancia;
 
   const passos = Math.max(
     1,
     Math.ceil(distancia / 5)
   );
+
+  const origem = { ...ultimoPonto };
 
   for (let i = 1; i <= passos; i++) {
     const px =
@@ -266,38 +140,51 @@ function limparCaminho(x, y) {
     const py =
       origem.y + (y - origem.y) * i / passos;
 
-    limpar(px, py);
+    limparPonto(px, py);
   }
 
+  distanciaTotal += distancia;
+
   ultimoPonto = { x, y };
+
+  if (
+    distanciaTotal >= distanciaNecessaria &&
+    !finalizado
+  ) {
+    finalizarVidro();
+  }
 }
 
-/* ==========================================
-   INTERAÇÃO COM O DEDO
-   ========================================== */
+/* =====================================
+   INTERAÇÃO
+   ===================================== */
 
-gelo.addEventListener("pointerdown", e => {
-  if (finalizado) return;
+canvas.addEventListener("pointerdown", e => {
+  if (finalizado || !imagemVidro.complete) return;
 
   e.preventDefault();
 
   limpando = true;
-  distanciaDaPassada = 0;
   ultimoPonto = null;
 
-  gelo.setPointerCapture(e.pointerId);
+  canvas.setPointerCapture(e.pointerId);
 
   limparCaminho(e.clientX, e.clientY);
 
-  if (!iniciado) {
-    iniciado = true;
+  /*
+    Prepara o vídeo durante a interação.
+    A reprodução será iniciada depois.
+  */
 
-    musica.volume = 0.35;
-    musica.play().catch(() => {});
+  if (!videoPreparado) {
+    videoPreparado = true;
+
+    video.muted = true;
+    video.load();
   }
 });
 
-gelo.addEventListener("pointermove", e => {
+canvas.addEventListener("pointermove", e => {
   if (!limpando || finalizado) return;
 
   e.preventDefault();
@@ -306,285 +193,75 @@ gelo.addEventListener("pointermove", e => {
 });
 
 function terminarToque() {
-  if (!limpando || finalizado) return;
-
   limpando = false;
   ultimoPonto = null;
-
-  /*
-    Só conta como passada quando
-    o dedo percorre uma distância
-    de pelo menos 25% da largura.
-  */
-
-  if (
-    distanciaDaPassada >=
-    window.innerWidth * DISTANCIA_MINIMA
-  ) {
-    passadas++;
-  }
-
-  distanciaDaPassada = 0;
-
-  if (passadas >= PASSADAS_NECESSARIAS) {
-    finalizarGelo();
-  }
 }
 
-gelo.addEventListener("pointerup", terminarToque);
-gelo.addEventListener("pointercancel", terminarToque);
+canvas.addEventListener("pointerup", terminarToque);
+canvas.addEventListener("pointercancel", terminarToque);
 
-/* ==========================================
-   FINALIZAÇÃO DO VIDRO
-   ========================================== */
+/* =====================================
+   FINALIZAR O VIDRO
+   ===================================== */
 
-async function finalizarGelo() {
+async function finalizarVidro() {
   if (finalizado) return;
 
   finalizado = true;
   limpando = false;
 
   instrucao.classList.add("ocultar");
-  gelo.classList.add("desaparecer");
+  canvas.classList.add("desaparecer");
 
-  await esperar(2300);
+  await esperar(2000);
 
-  gelo.remove();
-  instrucao.remove();
+  canvas.style.display = "none";
+  instrucao.style.display = "none";
 
-  iniciarHistoria();
+  await esperar(500);
+
+  iniciarVideo();
 }
 
-/* ==========================================
-   PREPARAÇÃO DAS PORTAS
-   ========================================== */
-
-function prepararPortas() {
-  /*
-    Mantemos a imagem original como
-    cenário e criamos duas folhas
-    que simulam a abertura.
-  */
-
-  if (portas.querySelector(".folha-porta")) return;
-
-  const fundoJardim = document.createElement("div");
-  fundoJardim.className = "jardim-atras";
-
-  const esquerda = document.createElement("div");
-  esquerda.className = "folha-porta esquerda";
-
-  const direita = document.createElement("div");
-  direita.className = "folha-porta direita";
-
-  portas.appendChild(fundoJardim);
-  portas.appendChild(esquerda);
-  portas.appendChild(direita);
+function esperar(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/* ==========================================
-   CENAS CINEMATOGRÁFICAS
-   ========================================== */
+/* =====================================
+   INICIAR VÍDEO
+   ===================================== */
 
-function ativarCena(cena) {
-  document.querySelectorAll(".cena").forEach(
-    elemento => elemento.classList.remove("ativa")
-  );
+async function iniciarVideo() {
+  video.currentTime = 0;
+  video.muted = true;
 
-  cena.classList.add("ativa");
-}
+  video.classList.add("mostrar");
 
-async function iniciarHistoria() {
-  portas.classList.add("aproximar");
-
-  await esperar(5000);
-
-  portas.classList.add("abrir");
-
-  await esperar(3000);
-
-  ativarCena(jardim);
-
-  await esperar(8000);
-
-  ativarCena(salao);
-
-  await esperar(7000);
-
-  salao.classList.add("girar");
-
-  await esperar(1800);
-
-  ativarCena(final);
-
-  await esperar(1600);
-
-  final.classList.add("mostrar-conteudo");
-}
-
-/* ==========================================
-   NEVE CONTÍNUA
-   ========================================== */
-
-let flocos = [];
-
-function prepararNeve() {
-  neve.width = window.innerWidth;
-  neve.height = window.innerHeight;
-
-  flocos = [];
-
-  const quantidade = Math.min(
-    90,
-    Math.floor(neve.width * 0.2)
-  );
-
-  for (let i = 0; i < quantidade; i++) {
-    flocos.push({
-      x: Math.random() * neve.width,
-      y: Math.random() * neve.height,
-      raio: 0.6 + Math.random() * 2,
-      velocidade: 0.3 + Math.random() * 1.1,
-      oscilacao: Math.random() * Math.PI * 2
-    });
-  }
-}
-
-function animarNeve() {
-  neveCtx.clearRect(
-    0, 0,
-    neve.width,
-    neve.height
-  );
-
-  for (const floco of flocos) {
-    floco.y += floco.velocidade;
-
-    floco.x += Math.sin(
-      floco.oscilacao + floco.y * 0.01
-    ) * 0.25;
-
-    if (floco.y > neve.height) {
-      floco.y = -5;
-      floco.x = Math.random() * neve.width;
-    }
-
-    neveCtx.beginPath();
-
-    neveCtx.arc(
-      floco.x,
-      floco.y,
-      floco.raio,
-      0,
-      Math.PI * 2
+  try {
+    await video.play();
+  } catch (erro) {
+    console.warn(
+      "O navegador bloqueou a reprodução automática:",
+      erro
     );
-
-    neveCtx.fillStyle =
-      "rgba(255,255,255,0.75)";
-
-    neveCtx.fill();
   }
-
-  requestAnimationFrame(animarNeve);
 }
 
-/* ==========================================
-   BOTÕES INTERATIVOS
-   ========================================== */
+/* =====================================
+   QUANDO O VÍDEO TERMINAR
+   ===================================== */
 
-const modal = document.getElementById("modal");
-const modalTitulo = document.getElementById("modal-titulo");
-const modalTexto = document.getElementById("modal-texto");
-
-const conteudos = {
-  confirmacao: {
-    titulo: "Confirmação",
-    texto: `
-      <p>
-        Informações para confirmação
-        disponíveis em breve.
-      </p>
-    `
-  },
-
-  local: {
-    titulo: "Localização",
-    texto: `
-      <p>
-        O local do Baile de Inverno
-        Encantado será informado em breve.
-      </p>
-    `
-  },
-
-  presentes: {
-    titulo: "Sugestões de Presentes",
-    texto: `
-      <p>
-        Perfumes, skincare, cosméticos,
-        acessórios, bolsas e kits de beleza.
-      </p>
-    `
-  },
-
-  traje: {
-    titulo: "Dress Code",
-    texto: `
-      <p><strong>Traje Social</strong></p>
-      <p>
-        Mulheres: vestidos ou produções elegantes.
-      </p>
-      <p>
-        Homens: camisa e calça social.
-        Blazer opcional.
-      </p>
-    `
-  }
-};
-
-document.querySelectorAll(".botao").forEach(botao => {
-  botao.addEventListener("click", () => {
-    const tipo = botao.dataset.modal;
-    const conteudo = conteudos[tipo];
-
-    if (!conteudo) return;
-
-    modalTitulo.textContent = conteudo.titulo;
-    modalTexto.innerHTML = conteudo.texto;
-
-    modal.classList.remove("oculto");
-  });
+video.addEventListener("ended", () => {
+  /*
+    Mantém o vídeo visível no último quadro.
+  */
+  video.pause();
 });
 
-function fecharModal() {
-  modal.classList.add("oculto");
-}
-
-document.getElementById("fechar-modal")
-  .addEventListener("click", fecharModal);
-
-document.querySelector(".modal-fundo")
-  .addEventListener("click", fecharModal);
-
-/* ==========================================
-   CONTROLE DA MÚSICA
-   ========================================== */
-
-controleMusica.addEventListener("click", () => {
-  if (musica.paused) {
-    musica.play().catch(() => {});
-  } else {
-    musica.pause();
-  }
-});
-
-/* ==========================================
+/* =====================================
    INICIALIZAÇÃO
-   ========================================== */
+   ===================================== */
 
-prepararGelo();
-prepararPortas();
-prepararNeve();
-animarNeve();
-
-window.addEventListener("resize", prepararNeve);
+if (imagemVidro.complete && imagemVidro.naturalWidth > 0) {
+  prepararVidro();
+     }
